@@ -8,9 +8,11 @@ use Models\Promocio;
 
 final class PromocioController
 {
+    public function __construct(private Promocio $promocioModel) {}
+
     public function index(): void
     {
-        $promocions = (new Promocio())->active();
+        $promocions = $this->promocioModel->active();
         View::render('public/promocions', [
             'title' => 'Promocions disponibles',
             'promocions' => $promocions,
@@ -19,7 +21,7 @@ final class PromocioController
 
     public function show(int $id): void
     {
-        $promocio = (new Promocio())->find($id);
+        $promocio = $this->promocioModel->find($id);
         if (!$promocio) {
             http_response_code(404);
             View::render('error', [

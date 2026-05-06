@@ -1,0 +1,8 @@
+RewriteEngine On
+
+# Si el fitxer o directori existeix, el serveix directament
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# En cas contrari, envia tot a index.php
+RewriteRule ^ index.php [QSA,L]

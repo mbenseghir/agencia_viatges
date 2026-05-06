@@ -13,7 +13,7 @@ final class Promocio extends Model
                 INNER JOIN paquets p ON p.id_paquet = pr.id_paquet
                 INNER JOIN proveidors pv ON pv.id_proveidor = p.id_proveidor
                 WHERE pr.activa = 1
-                  AND CURDATE() BETWEEN pr.data_inici_promocio AND pr.data_fi_promocio
+                  AND CURRENT_DATE BETWEEN pr.data_inici_promocio AND pr.data_fi_promocio
                 ORDER BY pr.data_inici_viatge ASC";
 
         return $this->db()->query($sql)->fetchAll();

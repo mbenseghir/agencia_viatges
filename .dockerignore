@@ -1,0 +1,8 @@
+vendor/
+.env
+.git/
+Dockerfile
+docker-compose.yml
+storage/cache/*
+storage/logs/*
+database/database.sqlite-journal

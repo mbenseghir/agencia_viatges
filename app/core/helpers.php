@@ -26,10 +26,16 @@ function e(mixed $value): string
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function url(string $route = 'home', array $params = []): string
+function url(string $route = '', array $params = []): string
 {
-    $params = array_merge(['r' => $route], $params);
-    return 'index.php?' . http_build_query($params);
+    $route = trim($route, '/');
+    $url = \config('app', 'base_url', '') . '/' . $route;
+    
+    if (!empty($params)) {
+        $url .= '?' . http_build_query($params);
+    }
+    
+    return $url;
 }
 
 function redirect(string $route, array $params = []): never

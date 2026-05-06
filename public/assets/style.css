@@ -211,3 +211,21 @@ small { color: var(--muted); }
     .header-inner, .footer-inner, .section-head { align-items: flex-start; flex-direction: column; }
     .detail-image { min-height: 260px; }
 }
+html, body { overflow-x: hidden; }
+
+.auth-container { 
+    display: grid; 
+    place-items: center; 
+    min-height: calc(100vh - 300px);
+    padding: 40px 0;
+}
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 40px;
+}
+.auth-header { text-align: center; margin-bottom: 32px; }
+.auth-header h2 { margin: 0 0 8px; font-size: 1.8rem; }
+.auth-header p { color: var(--muted); margin: 0; }
+.auth-form { display: grid; gap: 20px; }
+.auth-footer { text-align: center; margin-top: 24px; color: var(--muted); font-size: .9rem; }

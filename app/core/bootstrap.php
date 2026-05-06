@@ -8,27 +8,15 @@ define('APP_PATH', ROOT_PATH . '/app');
 define('VIEW_PATH', APP_PATH . '/views');
 define('STORAGE_PATH', ROOT_PATH . '/storage');
 
-spl_autoload_register(function (string $class): void {
-    $prefixes = [
-        'Core\\' => APP_PATH . '/core/',
-        'Controllers\\' => APP_PATH . '/controllers/',
-        'Models\\' => APP_PATH . '/models/',
-        'Services\\' => APP_PATH . '/services/',
-    ];
+if (file_exists(ROOT_PATH . '/vendor/autoload.php')) {
+    require_once ROOT_PATH . '/vendor/autoload.php';
+} else {
+    die("Siusplau, executa 'composer install' per instal·lar les dependències.");
+}
 
-    foreach ($prefixes as $prefix => $baseDir) {
-        $len = strlen($prefix);
-        if (strncmp($prefix, $class, $len) !== 0) {
-            continue;
-        }
-
-        $relativeClass = substr($class, $len);
-        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
-
-        if (is_file($file)) {
-            require $file;
-        }
-    }
-});
+if (file_exists(ROOT_PATH . '/.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(ROOT_PATH);
+    $dotenv->load();
+}
 
 require_once APP_PATH . '/core/helpers.php';

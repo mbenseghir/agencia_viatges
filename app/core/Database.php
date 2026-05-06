@@ -22,14 +22,23 @@ final class Database
             throw new RuntimeException('La configuració de base de dades no és vàlida.');
         }
 
-        $host = (string)($config['host'] ?? '127.0.0.1');
-        $port = (string)($config['port'] ?? '3306');
-        $dbname = (string)($config['dbname'] ?? 'agencia_viatges');
-        $charset = (string)($config['charset'] ?? 'utf8mb4');
-        $user = (string)($config['user'] ?? 'root');
-        $password = (string)($config['password'] ?? '');
+        $driver = $config['driver'] ?? 'mysql';
 
-        $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+        if ($driver === 'sqlite') {
+            $dbPath = $config['database'] ?? ':memory:';
+            $dsn = "sqlite:{$dbPath}";
+            $user = null;
+            $password = null;
+        } else {
+            $host = (string)($config['host'] ?? '127.0.0.1');
+            $port = (string)($config['port'] ?? '3306');
+            $dbname = (string)($config['dbname'] ?? 'agencia_viatges');
+            $charset = (string)($config['charset'] ?? 'utf8mb4');
+            $user = (string)($config['user'] ?? 'root');
+            $password = (string)($config['password'] ?? '');
+
+            $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+        }
 
         try {
             self::$pdo = new PDO($dsn, $user, $password, [
@@ -37,6 +46,10 @@ final class Database
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
+            
+            if ($driver === 'sqlite') {
+                self::$pdo->exec('PRAGMA foreign_keys = ON;');
+            }
         } catch (PDOException $e) {
             $safeMessage = 'No s’ha pogut connectar amb la base de dades. Revisa app/config/database.php.';
             if (\config('app', 'environment') === 'development') {

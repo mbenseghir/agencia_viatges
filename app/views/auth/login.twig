@@ -1,0 +1,28 @@
+{% extends 'layout.twig' %}
+{% block content %}
+<div class="auth-container">
+    <div class="card auth-card">
+        <div class="auth-header">
+            <h2>Accés intern</h2>
+            <p>Panell d'administració de reserves</p>
+        </div>
+        <form action="{{ url('auth/login') }}" method="post" class="auth-form">
+            {{ csrf_field()|raw }}
+            <div class="form-group">
+                <label for="email">Correu electrònic</label>
+                <input type="email" id="email" name="email" value="admin@agencia.test" required autofocus placeholder="admin@example.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Contrasenya</label>
+                <input type="password" id="password" name="password" value="admin123" required placeholder="••••••••">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn full">Entrar</button>
+            </div>
+        </form>
+        <div class="auth-footer">
+            <a href="{{ url('home') }}">← Tornar a la web</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

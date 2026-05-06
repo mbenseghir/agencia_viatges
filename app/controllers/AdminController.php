@@ -10,35 +10,36 @@ use Services\ProveedorNotifier;
 
 final class AdminController
 {
+    public function __construct(
+        private Promocio $promocioModel,
+        private Reserva $reservaModel,
+        private ProveedorNotifier $notifier
+    ) {}
+
     public function dashboard(): void
     {
-        \require_admin();
-
-        $reservaModel = new Reserva();
         View::render('admin/dashboard', [
             'title' => 'Panell de control',
-            'counts' => $reservaModel->countByStatus(),
-            'sales' => $reservaModel->totalSales(),
-            'latest' => $reservaModel->latest(8),
-            'promocions' => (new Promocio())->all(),
+            'counts' => $this->reservaModel->countByStatus(),
+            'sales' => $this->reservaModel->totalSales(),
+            'latest' => $this->reservaModel->latest(8),
+            'promocions' => $this->promocioModel->all(),
         ]);
     }
 
     public function reservas(): void
     {
-        \require_admin();
         $estat = isset($_GET['estat']) ? (string)$_GET['estat'] : null;
         View::render('admin/reservas', [
             'title' => 'Gestió de reserves',
-            'reservas' => (new Reserva())->all($estat),
+            'reservas' => $this->reservaModel->all($estat),
             'estat' => $estat,
         ]);
     }
 
     public function reserva(int $id): void
     {
-        \require_admin();
-        $reserva = (new Reserva())->find($id);
+        $reserva = $this->reservaModel->find($id);
         if (!$reserva) {
             http_response_code(404);
             View::render('error', [
@@ -56,38 +57,29 @@ final class AdminController
 
     public function acceptar(int $id): void
     {
-        \require_admin();
-        \verify_csrf();
-        $model = new Reserva();
-        $model->updateStatus($id, Reserva::ESTAT_ACCEPTADA);
-        $reserva = $model->find($id);
+        $this->reservaModel->updateStatus($id, Reserva::ESTAT_ACCEPTADA);
+        $reserva = $this->reservaModel->find($id);
         if ($reserva) {
-            (new ProveedorNotifier())->notifyAcceptedOrRejected($reserva, Reserva::ESTAT_ACCEPTADA);
+            $this->notifier->notifyAcceptedOrRejected($reserva, Reserva::ESTAT_ACCEPTADA);
         }
         \flash('success', 'Reserva acceptada. Ara el client podria procedir al pagament.');
-        \redirect('admin/reserva', ['id' => $id]);
+        \redirect('admin/reserva/' . $id);
     }
 
     public function rebutjar(int $id): void
     {
-        \require_admin();
-        \verify_csrf();
-        $model = new Reserva();
-        $model->updateStatus($id, Reserva::ESTAT_REBUTJADA);
-        $reserva = $model->find($id);
+        $this->reservaModel->updateStatus($id, Reserva::ESTAT_REBUTJADA);
+        $reserva = $this->reservaModel->find($id);
         if ($reserva) {
-            (new ProveedorNotifier())->notifyAcceptedOrRejected($reserva, Reserva::ESTAT_REBUTJADA);
+            $this->notifier->notifyAcceptedOrRejected($reserva, Reserva::ESTAT_REBUTJADA);
         }
         \flash('success', 'Reserva rebutjada.');
-        \redirect('admin/reserva', ['id' => $id]);
+        \redirect('admin/reserva/' . $id);
     }
 
     public function formalitzar(int $id): void
     {
-        \require_admin();
-        \verify_csrf();
-        $model = new Reserva();
-        $reserva = $model->find($id);
+        $reserva = $this->reservaModel->find($id);
         if (!$reserva) {
             \flash('danger', 'Reserva no trobada.');
             \redirect('admin/reservas');
@@ -98,12 +90,12 @@ final class AdminController
             \redirect('admin/reserva', ['id' => $id]);
         }
 
-        $model->updateStatus($id, Reserva::ESTAT_FORMALITZADA, (float)$reserva['total_reserva']);
-        $updated = $model->find($id);
+        $this->reservaModel->updateStatus($id, Reserva::ESTAT_FORMALITZADA, (float)$reserva['total_reserva']);
+        $updated = $this->reservaModel->find($id);
         if ($updated) {
-            (new ProveedorNotifier())->notifyFormalitzada($updated);
+            $this->notifier->notifyFormalitzada($updated);
         }
         \flash('success', 'Reserva formalitzada i notificada al proveïdor.');
-        \redirect('admin/reserva', ['id' => $id]);
+        \redirect('admin/reserva/' . $id);
     }
 }

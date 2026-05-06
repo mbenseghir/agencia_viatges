@@ -1,0 +1,27 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+<section class="section-head">
+    <div>
+        <span class="eyebrow">Catàleg</span>
+        <h1>Promocions disponibles</h1>
+    </div>
+</section>
+
+<div class="grid cards-grid">
+    {% for promocio in promocions %}
+        <article class="card travel-card compact">
+            <div class="card-body">
+                <div class="badges">
+                    <span class="badge">{{ promocio.pais_ruta }}</span>
+                    <span class="badge muted">{{ promocio.numero_dies }} dies</span>
+                </div>
+                <h3>{{ promocio.paquet_nom }}</h3>
+                <p>{{ promocio.punt_origen }} · {{ promocio.proveidor_nom }}</p>
+                <div class="price-row"><span>Adult</span><strong>{{ money(promocio.preu_base_adult) }}</strong></div>
+                <a class="btn full" href="{{ url('promocio/' ~ promocio.id_promocio) }}">Veure detall</a>
+            </div>
+        </article>
+    {% endfor %}
+</div>
+{% endblock %}

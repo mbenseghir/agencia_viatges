@@ -1,0 +1,58 @@
+{% extends 'layout.twig' %}
+{% block content %}
+<section class="hero">
+    <div>
+        <span class="eyebrow">Paquets tancats amb proveïdor</span>
+        <h1>Reserva el teu viatge amb un procés clar i controlat.</h1>
+        <p>Consulta les promocions actives, envia una pre-reserva i espera la validació del proveïdor abans del pagament.</p>
+        <div class="hero-actions">
+            <a class="btn" href="#promocions">Veure promocions</a>
+            {% if not is_admin() %}
+                <a class="btn btn-secondary" href="{{ url('auth/login') }}">Entrar al panell intern</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="hero-card">
+        <strong>Flux de reserva</strong>
+        <ol class="steps">
+            <li>Client envia pre-reserva</li>
+            <li>Notificació al proveïdor</li>
+            <li>Acceptació o rebuig</li>
+            <li>Pagament i formalització</li>
+        </ol>
+    </div>
+</section>
+
+<section id="promocions" class="section-head">
+    <div>
+        <span class="eyebrow">Promocions actives</span>
+        <h2>Viatges disponibles</h2>
+    </div>
+    <p>{{ promocions|length }} promocions disponibles ara mateix.</p>
+</section>
+
+{% if promocions is empty %}
+    <div class="panel">No hi ha promocions actives en aquest moment.</div>
+{% else %}
+    <div class="grid cards-grid">
+        {% for promocio in promocions %}
+            <article class="card travel-card">
+                <div class="image-placeholder" style="background-image: linear-gradient(135deg, rgba(15,23,42,.30), rgba(15,23,42,.75)), url('{{ promocio.galeria_url }}');"></div>
+                <div class="card-body">
+                    <div class="badges">
+                        <span class="badge">{{ promocio.continent }}</span>
+                        <span class="badge muted">{{ promocio.numero_dies }} dies</span>
+                    </div>
+                    <h3>{{ promocio.paquet_nom }}</h3>
+                    <p>{{ promocio.descripcio[:120] ~ '...' }}</p>
+                    <div class="price-row">
+                        <span>Adult des de</span>
+                        <strong>{{ money(promocio.preu_base_adult) }}</strong>
+                    </div>
+                    <a class="btn full" href="{{ url('promocio/' ~ promocio.id_promocio) }}">Veure detall</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

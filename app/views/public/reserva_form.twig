@@ -1,0 +1,116 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+{% set oldTravelers = old.viatgers|default([{
+    'nom': '', 'cognoms': '', 'adult': '1', 'habitacio_individual': '0', 'categoria_superior': '0',
+    'document_identitat': '', 'nacionalitat': '', 'data_naixement': '', 'preferencies': ''
+}]) %}
+
+<section class="section-head">
+    <div>
+        <span class="eyebrow">Pre-reserva</span>
+        <h1>{{ promocio.paquet_nom }}</h1>
+    </div>
+    <p>El total es calcula en servidor segons adults, nens i suplements.</p>
+</section>
+
+{% include 'partials/errors.twig' %}
+
+<form class="booking-form" method="post" action="{{ url('reserva/crear/' ~ promocio.id_promocio) }}">
+    {{ csrf_field()|raw }}
+
+    <section class="panel">
+        <h2>Dades del client</h2>
+        <div class="form-grid">
+            <label>Nom
+                <input name="client_nom" value="{{ old.client_nom|default('') }}" required>
+            </label>
+            <label>Cognoms
+                <input name="client_cognoms" value="{{ old.client_cognoms|default('') }}" required>
+            </label>
+            <label>Telèfon
+                <input name="client_telefon" value="{{ old.client_telefon|default('') }}" required>
+            </label>
+            <label>Correu electrònic
+                <input type="email" name="client_correu" value="{{ old.client_correu|default('') }}" required>
+            </label>
+            <label>DNI o passaport
+                <input name="client_document" value="{{ old.client_document|default('') }}" required>
+            </label>
+            <label>Nacionalitat
+                <input name="client_nacionalitat" value="{{ old.client_nacionalitat|default('') }}" required>
+            </label>
+            <label class="wide">Adreça
+                <input name="client_adreca" value="{{ old.client_adreca|default('') }}">
+            </label>
+            <label class="wide">Observacions generals
+                <textarea name="observacions" rows="3">{{ old.observacions|default('') }}</textarea>
+            </label>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="section-inline">
+            <div>
+                <h2>Viatgers</h2>
+                <p>Afegeix les dades de cada persona que viatja.</p>
+            </div>
+            <button class="btn btn-secondary" type="button" data-add-traveler>Afegir viatger</button>
+        </div>
+
+        <div id="travelers" data-adult-price="{{ promocio.preu_base_adult }}" data-child-price="{{ promocio.preu_base_nen }}" data-single-price="{{ promocio.preu_extra_individual }}" data-superior-price="{{ promocio.preu_extra_categoria_superior }}">
+            {% for i, traveler in oldTravelers %}
+                <div class="traveler-card" data-traveler>
+                    <div class="traveler-head">
+                        <strong>Viatger <span data-traveler-number>{{ i + 1 }}</span></strong>
+                        <button class="link-button" type="button" data-remove-traveler>Eliminar</button>
+                    </div>
+                    <div class="form-grid">
+                        <label>Nom
+                            <input name="viatgers[{{ i }}][nom]" value="{{ traveler.nom|default('') }}" required>
+                        </label>
+                        <label>Cognoms
+                            <input name="viatgers[{{ i }}][cognoms]" value="{{ traveler.cognoms|default('') }}" required>
+                        </label>
+                        <label>Tipus
+                            <select name="viatgers[{{ i }}][adult]" data-price-trigger>
+                                <option value="1" {{ (traveler.adult|default('1') == '1') ? 'selected' : '' }}>Adult</option>
+                                <option value="0" {{ (traveler.adult|default('1') == '0') ? 'selected' : '' }}>Nen</option>
+                            </select>
+                        </label>
+                        <label>DNI o passaport
+                            <input name="viatgers[{{ i }}][document_identitat]" value="{{ traveler.document_identitat|default('') }}" required>
+                        </label>
+                        <label>Nacionalitat
+                            <input name="viatgers[{{ i }}][nacionalitat]" value="{{ traveler.nacionalitat|default('') }}" required>
+                        </label>
+                        <label>Data naixement
+                            <input type="date" name="viatgers[{{ i }}][data_naixement]" value="{{ traveler.data_naixement|default('') }}">
+                        </label>
+                        <label class="check-row">
+                            <input type="checkbox" name="viatgers[{{ i }}][habitacio_individual]" value="1" data-price-trigger {{ traveler.habitacio_individual|default(false) ? 'checked' : '' }}>
+                            Habitació individual
+                        </label>
+                        <label class="check-row">
+                            <input type="checkbox" name="viatgers[{{ i }}][categoria_superior]" value="1" data-price-trigger {{ traveler.categoria_superior|default(false) ? 'checked' : '' }}>
+                            Categoria superior
+                        </label>
+                        <label class="wide">Preferències
+                            <textarea name="viatgers[{{ i }}][preferencies]" rows="2">{{ traveler.preferencies|default('') }}</textarea>
+                        </label>
+                    </div>
+                    <div class="traveler-price">Preu estimat: <strong data-traveler-price>0,00 €</strong></div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <aside class="summary-bar">
+        <div>
+            <span>Total estimat</span>
+            <strong data-booking-total>0,00 €</strong>
+        </div>
+        <button class="btn" type="submit">Enviar pre-reserva</button>
+    </aside>
+</form>
+{% endblock %}
