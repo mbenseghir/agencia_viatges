@@ -11,9 +11,16 @@ use Services\Validator;
 
 final class ReservaController
 {
+    public function __construct(
+        private Promocio $promocioModel,
+        private Reserva $reservaModel,
+        private ProveedorNotifier $notifier,
+        private Validator $validator
+    ) {}
+
     public function create(int $promocioId): void
     {
-        $promocio = (new Promocio())->find($promocioId);
+        $promocio = $this->promocioModel->find($promocioId);
         if (!$promocio) {
             http_response_code(404);
             View::render('error', [
@@ -33,9 +40,7 @@ final class ReservaController
 
     public function store(int $promocioId): void
     {
-        \verify_csrf();
-
-        $promocio = (new Promocio())->find($promocioId);
+        $promocio = $this->promocioModel->find($promocioId);
         if (!$promocio) {
             http_response_code(404);
             View::render('error', [
@@ -58,21 +63,20 @@ final class ReservaController
             return;
         }
 
-        $model = new Reserva();
-        $reservaId = $model->create($clientData, $travelers, $promocio);
-        $reserva = $model->find($reservaId);
+        $reservaId = $this->reservaModel->create($clientData, $travelers, $promocio);
+        $reserva = $this->reservaModel->find($reservaId);
 
         if ($reserva) {
-            (new ProveedorNotifier())->notifyPreReserva($reserva);
+            $this->notifier->notifyPreReserva($reserva);
         }
 
         \flash('success', 'Pre-reserva registrada. Hem notificat el proveïdor.');
-        \redirect('reserva/gracies', ['id' => $reservaId]);
+        \redirect('reserva/gracies/' . $reservaId);
     }
 
     public function success(int $id): void
     {
-        $reserva = (new Reserva())->find($id);
+        $reserva = $this->reservaModel->find($id);
         if (!$reserva) {
             http_response_code(404);
             View::render('error', [
@@ -127,8 +131,7 @@ final class ReservaController
 
     private function validatePayload(array $clientData, array $travelers): array
     {
-        $validator = new Validator();
-        $validator
+        $this->validator
             ->required('client_nom', $clientData['nom'], 'nom del client')
             ->required('client_cognoms', $clientData['cognoms'], 'cognoms del client')
             ->required('client_telefon', $clientData['telefon'], 'telèfon')
@@ -137,7 +140,7 @@ final class ReservaController
             ->required('client_document', $clientData['document_identitat'], 'DNI o passaport')
             ->required('client_nacionalitat', $clientData['nacionalitat'], 'nacionalitat');
 
-        $errors = $validator->errors();
+        $errors = $this->validator->errors();
 
         if (count($travelers) === 0) {
             $errors['viatgers'][] = 'Cal informar com a mínim un viatger.';

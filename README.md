@@ -13,7 +13,23 @@ El projecte ve preparat per a MAMP:
 'charset' => 'utf8mb4',
 ```
 
-## Instal·lacio
+## Instal·lacio (Mode Terminal - Recomanat)
+
+Hem afegit eines per executar el projecte fàcilment des del terminal sense necessitat de configurar l'Apache de MAMP/XAMPP.
+
+1. Assegura't de tenir el servei MySQL de MAMP/XAMPP funcionant (o qualsevol altre MySQL).
+2. Obre un terminal a la carpeta del projecte.
+3. Executa les migracions de la base de dades (crearà la BD i les taules):
+   ```bash
+   php cli.php migrate
+   ```
+4. Inicia el servidor de desenvolupament:
+   ```bash
+   php cli.php serve
+   ```
+5. Obre al navegador: http://localhost:8000
+
+## Instal·lacio (Mode Tradicional)
 
 1. Copia la carpeta del projecte dins la carpeta web de MAMP/XAMPP.
 2. Obre phpMyAdmin o MySQL Workbench.
@@ -25,10 +41,10 @@ database/agencia_viatges.sql
 
 Important: executa el fitxer complet des del principi. El fitxer fa `DROP DATABASE IF EXISTS agencia_viatges` i la torna a crear per evitar errors de claus foranes amb taules antigues.
 
-4. Obre al navegador:
+4. Obre al navegador (ajusta la ruta segons la teva carpeta):
 
 ```text
-http://localhost:8888/projecte_agencia_viatges_php_PRO_v2_BDD_FIX/public/
+http://localhost:8888/nom_carpeta/public/
 ```
 
 ## Usuari administrador

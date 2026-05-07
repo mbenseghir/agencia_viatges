@@ -1,0 +1,52 @@
+{% set messages = flash() %}
+<!doctype html>
+<html lang="ca">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title|default(config('app', 'name')) }} · {{ config('app', 'name') }}</title>
+    <link rel="stylesheet" href="{{ url('assets/style.css') }}">
+</head>
+<body>
+<header class="site-header">
+    <div class="container header-inner">
+        <a class="brand" href="{{ url('home') }}">
+            <span class="brand-mark">PT</span>
+            <span>{{ config('app', 'name') }}</span>
+        </a>
+        <nav class="nav">
+            <a href="{{ url('home') }}">Promocions</a>
+            {% if is_admin() %}
+                <a href="{{ url('admin/dashboard') }}">Administració</a>
+                <a href="{{ url('admin/reservas') }}">Reserves</a>
+                <a href="{{ url('auth/logout') }}">Sortir</a>
+            {% else %}
+                <a href="{{ url('auth/login') }}">Accés intern</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<main class="container main">
+    {% if messages %}
+        <div class="alerts">
+            {% for type, items in messages %}
+                {% for message in items %}
+                    <div class="alert alert-{{ type }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-inner">
+        <span>UF1845 · Accés a dades en aplicacions web de l’entorn servidor</span>
+        <span>Projecte pràctic: agència de viatges</span>
+    </div>
+</footer>
+<script src="{{ url('assets/app.js') }}"></script>
+</body>
+</html>

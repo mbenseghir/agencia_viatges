@@ -1,0 +1,12 @@
+{% if errors is not empty %}
+    <div class="alert alert-danger">
+        <strong>Revisa el formulari:</strong>
+        <ul>
+            {% for items in errors %}
+                {% for error in items %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}

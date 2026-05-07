@@ -24,7 +24,7 @@ final class Reserva extends Model
                 "INSERT INTO reserves
                     (id_client, id_promocio, estat, data_reserva, data_inici, data_fi, total_reserva, total_pagat, observacions)
                  VALUES
-                    (:id_client, :id_promocio, :estat, NOW(), :data_inici, :data_fi, :total_reserva, 0, :observacions)"
+                    (:id_client, :id_promocio, :estat, CURRENT_TIMESTAMP, :data_inici, :data_fi, :total_reserva, 0, :observacions)"
             );
             $stmt->execute([
                 'id_client' => $clientId,
@@ -176,7 +176,7 @@ final class Reserva extends Model
         $params = ['estat' => $newStatus, 'id' => $idReserva];
 
         if ($newStatus === self::ESTAT_FORMALITZADA) {
-            $fields[] = 'data_formalitzacio = NOW()';
+            $fields[] = 'data_formalitzacio = CURRENT_TIMESTAMP';
             $fields[] = 'total_pagat = :total_pagat';
             $params['total_pagat'] = $amountPaid;
         }

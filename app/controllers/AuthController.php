@@ -8,6 +8,8 @@ use Models\Usuari;
 
 final class AuthController
 {
+    public function __construct(private Usuari $usuariModel) {}
+
     public function showLogin(): void
     {
         View::render('auth/login', [
@@ -17,11 +19,9 @@ final class AuthController
 
     public function login(): void
     {
-        \verify_csrf();
-
         $email = \post_string('email', 190);
         $password = (string)($_POST['password'] ?? '');
-        $user = (new Usuari())->findByEmail($email);
+        $user = $this->usuariModel->findByEmail($email);
 
         if (!$user || !password_verify($password, (string)$user['password_hash'])) {
             \flash('danger', 'Credencials incorrectes.');
